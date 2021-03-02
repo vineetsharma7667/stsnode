@@ -2,7 +2,7 @@ const express=require('express');
 const bodyParser=require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
-const PORT = 4800;
+const PORT = 6001;
 const {mongoUrl} =require('./keys');
 require('./models/user');
 require('./models/FeeCategory');
@@ -34,10 +34,10 @@ app.use('/public', express.static('public'));
 const authRoutes = require('./routes/authRoutes');
 app.use(authRoutes);
 mongoose.connect(mongoUrl,{
-    auth: {
-        "user":"admin2",
-        "password":"T3st$3m0",  
-      },
+    // auth: {
+    //     "user":"admin2",
+    //     "password":"T3st$3m0",  
+    //   },
      useNewUrlParser:true,
      useUnifiedTopology: true
 })
