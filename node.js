@@ -24,6 +24,7 @@ require('./models/FeeStructure');
 require('./models/Receipt');
 require('./models/Fine');
 require('./models/Bank');
+require('./models/PreAdmissionForm');
 
 const requireToken= require('./middleware/requireToken');
 app.use(bodyParser.json());
@@ -34,10 +35,6 @@ app.use('/public', express.static('public'));
 const authRoutes = require('./routes/authRoutes');
 app.use(authRoutes);
 mongoose.connect(mongoUrl,{
-    // auth: {
-    //     "user":"admin2",
-    //     "password":"T3st$3m0",  
-    //   },
      useNewUrlParser:true,
      useUnifiedTopology: true
 })

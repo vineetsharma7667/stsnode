@@ -27,6 +27,8 @@ const FeeStructure = mongoose.model('FeeStructure')
 const Receipt = mongoose.model('Receipt')
 const Bank = mongoose.model('Bank')
 
+const PreAdmissionForm = mongoose.model('PreAdmissionForm')
+
 
 const cors = require('cors');
 multer = require('multer')
@@ -87,6 +89,61 @@ var storage = multer.diskStorage({
         }
     })
 // End Signin routes
+// pre admission
+router.post('/StorePreAdmissionForm', upload.single('image'), async (req, res) => {
+    const { name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session } = req.body;
+    try {
+        const Fee_cat = new PreAdmissionForm({ name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session })
+        await Fee_cat.save();
+        if (Fee_cat) {
+            console.log("Fee_cat")
+        }
+        else {
+            console.log("data is not stored")
+        }
+        console.log(Fee_cat);
+        res.send(Fee_cat)
+    } catch (err) {
+        return res.status(422).send(err.message)
+     
+    }
+    })
+
+    
+router.get('/getPreAdmissionFormData', async (req, res) => {
+    try {
+        const data = await PreAdmissionForm.find()
+        if (data) {
+            console.log(data[0])
+        }
+        console.log(data[0])
+        res.send(data)
+    }
+    catch (err) {
+        return res.status(422).send({ error: "error for fetching food data" })
+    }
+})
+router.put('/updatePreadmissionFormData', upload.single('image') ,async (req, res) => {
+    console.log("Yes I Am In")
+    const { _id,name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session  } = req.body;
+    // const image = req.file.path
+    PreAdmissionForm.findByIdAndUpdate({_id},{ name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session  }, function(err, result){
+        if(err){
+            res.send(err)
+        }
+        else{
+            res.send(result)
+        }
+    })
+})
+router.delete('/deletePreAdmissionFormData', (req, res) => {
+    const { _id } = req.body
+    console.log(_id)
+    PreAdmissionForm.findByIdAndRemove(_id).exec();
+    res.send({ res: "Deleted Sucessfully" })
+})
+
+// end pre admission
 
 // Start Fee category routes
 router.post('/StoreFeeCatogory', upload.single('image'), async (req, res) => {
