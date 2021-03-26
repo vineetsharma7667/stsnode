@@ -10,6 +10,9 @@ const AcademicSchema = new Schema({
     school_id:{
         type:String,        
     },
+    tc_status:{
+        type:String,        
+    },
     session:{
         type:String,        
     }, 

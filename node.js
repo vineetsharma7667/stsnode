@@ -25,6 +25,7 @@ require('./models/Receipt');
 require('./models/Fine');
 require('./models/Bank');
 require('./models/PreAdmissionForm');
+require('./models/SuspensionalFee');
 
 const requireToken= require('./middleware/requireToken');
 app.use(bodyParser.json());
@@ -34,7 +35,13 @@ app.use(cors({ origin: true }));
 app.use('/public', express.static('public'));
 const authRoutes = require('./routes/authRoutes');
 app.use(authRoutes);
+mongoose.set('useNewUrlParser',true);
+mongoose.set('useCreateIndex',true);
 mongoose.connect(mongoUrl,{
+    auth: {
+        "user":"adminSaint",
+        "password":"T3st$3m0123",  
+      },
      useNewUrlParser:true,
      useUnifiedTopology: true
 })

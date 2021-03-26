@@ -26,8 +26,8 @@ const Fine = mongoose.model('Fine')
 const FeeStructure = mongoose.model('FeeStructure')
 const Receipt = mongoose.model('Receipt')
 const Bank = mongoose.model('Bank')
+const SuspensionalFee = mongoose.model('SuspensionalFee')
 
-const PreAdmissionForm = mongoose.model('PreAdmissionForm')
 
 
 const cors = require('cors');
@@ -37,7 +37,8 @@ multer({
   })
 router.use(cors({ origin: true }));
 //code for images
-var multer = require('multer')
+var multer = require('multer');
+const e = require('express');
 
 var storage = multer.diskStorage({
 
@@ -89,30 +90,29 @@ var storage = multer.diskStorage({
         }
     })
 // End Signin routes
-// pre admission
-router.post('/StorePreAdmissionForm', upload.single('image'), async (req, res) => {
-    const { name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session } = req.body;
+// Suspensioanle fee
+router.post('/StoreSuspensionalVoucher', upload.single('image'), async (req, res) => {
+    const { admission_no,bank,remark,account_no,receipt_date,class_name,amount } = req.body;
     try {
-        const Fee_cat = new PreAdmissionForm({ name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session })
-        await Fee_cat.save();
-        if (Fee_cat) {
-            console.log("Fee_cat")
+        const SuspensionalFees = new SuspensionalFee({admission_no,bank,remark,account_no,receipt_date,class_name,amount })
+        await SuspensionalFees.save();
+        if (SuspensionalFees) {
+            console.log("SuspensionalFees")
         }
         else {
             console.log("data is not stored")
         }
-        console.log(Fee_cat);
-        res.send(Fee_cat)
+        console.log(SuspensionalFees);
+        res.send(SuspensionalFees)
     } catch (err) {
         return res.status(422).send(err.message)
      
     }
     })
 
-    
-router.get('/getPreAdmissionFormData', async (req, res) => {
+    router.get('/getSuspensionalFee', async (req, res) => {
     try {
-        const data = await PreAdmissionForm.find()
+        const data = await SuspensionalFee.find()
         if (data) {
             console.log(data[0])
         }
@@ -122,29 +122,29 @@ router.get('/getPreAdmissionFormData', async (req, res) => {
     catch (err) {
         return res.status(422).send({ error: "error for fetching food data" })
     }
-})
-router.put('/updatePreadmissionFormData', upload.single('image') ,async (req, res) => {
-    console.log("Yes I Am In")
-    const { _id,name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session  } = req.body;
-    // const image = req.file.path
-    PreAdmissionForm.findByIdAndUpdate({_id},{ name,class_name,parent_address,parent_mobile,date_of_admission,sex,father_name,mother_name,dob,session  }, function(err, result){
-        if(err){
-            res.send(err)
-        }
-        else{
-            res.send(result)
-        }
     })
-})
-router.delete('/deletePreAdmissionFormData', (req, res) => {
-    const { _id } = req.body
-    console.log(_id)
-    PreAdmissionForm.findByIdAndRemove(_id).exec();
-    res.send({ res: "Deleted Sucessfully" })
-})
 
-// end pre admission
+    router.put('/SuspensionalFeeData', upload.single('image') ,async (req, res) => {
+        console.log("Yes I Am In")
+        const { _id,admission_no,bank,remark,account_no,receipt_date,class_name,amount  } = req.body;
+        // const image = req.file.path
+        SuspensionalFee.findByIdAndUpdate({_id},{ admission_no,bank,remark,account_no,receipt_date,class_name,amount  }, function(err, result){
+            if(err){
+                res.send(err)
+            }
+            else{
+                res.send(result)
+            }
+        })
+    })
 
+    router.delete('/deleteSuspensionalFee', (req, res) => {
+        const { _id } = req.body
+        console.log(_id)
+        SuspensionalFee.findByIdAndRemove(_id).exec();
+        res.send({ res: "Deleted Sucessfully" })
+    })
+// End Suspensioanle fee
 // Start Fee category routes
 router.post('/StoreFeeCatogory', upload.single('image'), async (req, res) => {
 const { category,description } = req.body;
@@ -330,6 +330,12 @@ router.post('/StoreSession', upload.single('image'), async (req, res) => {
             return res.status(422).send({ error: "error for fetching food data" })
             
         }
+    })
+    router.delete('/deleteSession', (req, res) => {
+        const { _id } = req.body
+        console.log(_id)
+        Session.findByIdAndRemove(_id).exec();
+        res.send({ res: "Deleted Sucessfully" })
     })
 // end Session routes
 
@@ -699,11 +705,9 @@ router.post('/StoreSubject', upload.single('image'), async (req, res) => {
     }
     })
 
-    
-    router.post('/getSubjects', async (req, res) => {
-            const {  school_id} = req.body
+    router.get('/getSubjects', async (req, res) => {
         try {
-            const data = await Subject.find({school_id})
+            const data = await Subject.find()
             if (data) {
                 console.log(data[0])
             }
@@ -713,7 +717,6 @@ router.post('/StoreSubject', upload.single('image'), async (req, res) => {
         catch (err) {
             return res.status(422).send({ error: "error for fetching food data" })
         }
-        
     })
     router.put('/updateSubject', upload.single('image') ,async (req, res) => {
         console.log("Yes I Am In")
@@ -871,11 +874,11 @@ router.post('/StoreStudent', upload.fields([{
     image4 = req.body.image4 
     }
     try {
-        const Student_data = new Student({image,image2,image3,image4,school_id,unique_id,session,date_of_admission,balance,parent,admission_no,security_no,old_admission_no,aadhar_no,class_name,section,subjects,is_start_from_first_class,last_class,category,house,name,sex,dob,nationality,reg_no,roll_no,board_roll_no,last_school,fee_concession,bus_fare_concession,vehicle_no,is_teacher_ward,paid_upto_month,paid_upto_year,last_school_performance,is_full_free_ship,avail_transport,take_computer,no_exempt_security_deposit,ncc,no_exempt_registration,no_exempt_admission,is_repeater,other_details,misc_details,account_no,father_name,mother_name,father_occu,father_designation,father_annual_income,mother_occu,mother_desgination,mother_annual_income,parent_address,parent_city,parent_state,parent_country, parent_per_address,parent_per_city,parent_per_state,parent_per_country,parent_phone,parent_mobile,gaurdian_name,gaurdian_occu,gaurdian_designation,gaurdian_annual_income,gaurdian_address,gaurdian_city,gaurdian_state,gaurdian_country,gaurdian_per_address,gaurdian_per_city,gaurdian_per_state,gaurdian_per_country,gaurdian_phone,gaurdian_mobile,religion})
+        const Student_data = new Student({image,image2,image3,image4,school_id,tc_status:'0',unique_id,session,date_of_admission,balance,parent,admission_no,security_no,old_admission_no,aadhar_no,class_name,section,subjects,is_start_from_first_class,last_class,category,house,name,sex,dob,nationality,reg_no,roll_no,board_roll_no,last_school,fee_concession,bus_fare_concession,vehicle_no,is_teacher_ward,paid_upto_month,paid_upto_year,last_school_performance,is_full_free_ship,avail_transport,take_computer,no_exempt_security_deposit,ncc,no_exempt_registration,no_exempt_admission,is_repeater,other_details,misc_details,account_no,father_name,mother_name,father_occu,father_designation,father_annual_income,mother_occu,mother_desgination,mother_annual_income,parent_address,parent_city,parent_state,parent_country, parent_per_address,parent_per_city,parent_per_state,parent_per_country,parent_phone,parent_mobile,gaurdian_name,gaurdian_occu,gaurdian_designation,gaurdian_annual_income,gaurdian_address,gaurdian_city,gaurdian_state,gaurdian_country,gaurdian_per_address,gaurdian_per_city,gaurdian_per_state,gaurdian_per_country,gaurdian_phone,gaurdian_mobile,religion})
         await Student_data.save();
         if (Student_data) {
            await console.log("Student_data")
-            const Academic_data = new Academic({student:Student_data._id,school_id,unique_id,session,class_name,section,admission_no,account_no})
+            const Academic_data = new Academic({student:Student_data._id,tc_status:'0',school_id,unique_id,session,class_name,section,admission_no,account_no})
             Academic_data.save();
         }
         else {
@@ -889,11 +892,37 @@ router.post('/StoreStudent', upload.fields([{
     }
     })
 
-        router.post('/getStudent', async (req, res) => {
+    router.post('/getStudent', async (req, res) => {
         const { session,school_id} = req.body
         console.log(req.body)
         try {
-                await Academic.find({session,school_id}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                await Academic.find({session,school_id,tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data)
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+    // router.post('/getStudentCount', async (req, res) => {
+    //     const { session} = req.body
+    //     console.log(req.body)
+    //     try {
+    //             await Academic.find({session,tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+    //             console.log("gfgfdgfdgfdgsadsadadsa",data)
+    //             res.send(data.length)
+    //         })
+    //     }
+    //     catch (err) {
+    //         return res.status(422).send({ error: "error for fetching food data" })
+    //     }
+    // })
+    router.post('/singleparentdata', async (req, res) => {
+        const { session,account_no} = req.body
+        console.log(req.body)
+        try {
+                await Academic.find({session,account_no,tc_status:'0'}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
                 console.log("gfgfdgfdgfdgsadsadadsa",data)
                 res.send(data)
             })
@@ -906,7 +935,7 @@ router.post('/StoreStudent', upload.fields([{
         const { session, class_name} = req.body
         console.log(req.body)
         try {
-             await Academic.find({session,class_name}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+             await Academic.find({session,class_name,tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
                 console.log("gfgfdgfdgfdgsadsadadsa",data)
                 res.send(data)
             })
@@ -919,7 +948,7 @@ router.post('/StoreStudent', upload.fields([{
         const { session, class_name,section} = req.body
         console.log(req.body)
         try {
-             await Academic.find({session,class_name,section}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+             await Academic.find({session,class_name,section,tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
                 console.log("gfgfdgfdgfdgsadsadadsa",data)
                 res.send(data)
             })
@@ -932,7 +961,7 @@ router.post('/StoreStudent', upload.fields([{
         const { session,admission_no,school_id} = req.body
         console.log(req.body)
         try {
-             await Academic.find({session,admission_no,school_id}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+             await Academic.find({session,admission_no,school_id,tc_status:'0'}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
                 console.log("gfgfdgfdgfdgsadsadadsa",data)
                 res.send(data)
             })
@@ -1028,6 +1057,56 @@ router.post('/StoreStudent', upload.fields([{
             }
         })
     })
+
+    router.post('/StudentStrenght', async (req, res) => {
+        console.log('yes im in' + req.body.class_name)
+        const {session,section,class_name } = req.body;
+         if(class_name == ""){
+            try {
+                await Academic.find({session,tc_status:'0'}).populate('student').sort({ class_name: 1 }).exec((err,data)=>{
+                    console.log("gfgfdgfdgfdgsadsadadsa",data)
+                    res.send(data)
+                })
+             }
+             catch (err) {
+                 return res.status(422).send({ error: "error for fetching profile data" })
+             }
+        }
+        else if(section ==""){
+            try {
+                if(class_name!="PRE-NUR"){
+                await Academic.find({session,class_name,tc_status:"0"}).populate('student').sort({ section: 1 }).exec((err,data)=>{
+                    console.log("gfgfdgfdgfdgsadsadadsa",data)
+                    res.send(data)
+                })
+                }else{
+                    await Academic.find({session,class_name,section,tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                        console.log("gfgfdgfdgfdgsadsadadsa",data)
+                        res.send(data)
+                    })
+                }
+             }
+             catch (err) {
+                 return res.status(422).send({ error: "error for fetching profile data" })
+            }
+        }
+        else{
+            console.log("yes ia am in vineet")
+            try {
+                await Academic.find({session,class_name,section,tc_status:'0'}).populate('student').sort({ section: -1 }).exec((err,data)=>{
+                    console.log("gfgfdgfdgfdgsadsadadsa",data)
+                    res.send(data)
+                })
+             }
+             catch (err) {
+                 return res.status(422).send({ error: "error for fetching profile data" })
+             }
+        }
+       
+    })
+
+
+
     router.delete('/deleteFeeStructure', (req, res) => {
         const { _id } = req.body
         console.log(_id)
@@ -1062,7 +1141,7 @@ router.post('/StoreStudent', upload.fields([{
                 console.log("Data inserted")  // Success 
                 if (Student_data) {
                     for (var i = 0; i <result.length; i++) {
-                     const Academic_data = new Academic({student:result[i]._id,school_id:result[i].school_id,unique_id:result[i].unique_id,session:result[i].session,class_name:result[i].class_name,section:result[i].section,admission_no:result[i].admission_no,account_no:result[i].account_no})
+                     const Academic_data = new Academic({student:result[i]._id,school_id:result[i].school_id,unique_id:result[i].unique_id,session:result[i].session,class_name:result[i].class_name,section:result[i].section,admission_no:result[i].admission_no,account_no:result[i].account_no,tc_status:result[i].tc_status})
                      Academic_data.save();
                     }
                  }
@@ -1077,7 +1156,22 @@ router.post('/StoreStudent', upload.fields([{
                 console.log(err.message.toString().includes('duplicate'))  
             }
         })
-
+        router.post('/Importallfees',upload.single('image'),async (req, res) => {
+            console.log("yes im in");
+            // console.log(req.body);
+            const {AllFeeData} = req.body;
+            console.log("yes im in"+ AllFeeData);
+            try {
+              const  AllFeeDataa=   Receipt.insertMany(JSON.parse(AllFeeData)).then(result=>{ 
+                console.log("Data inserted")  // Success 
+                if (AllFeeDataa) {
+                    res.send(AllFeeDataa)
+                 }
+                })
+            } catch (err) {
+                console.log(err.message.toString().includes('duplicate'))  
+            }
+        })
         router.post('/DeleteUpgradeStudent', upload.single('image'),async (req, res) => {
             const {IdArray} = req.body;
                 Academic.deleteMany(
@@ -1205,9 +1299,10 @@ router.post('/StoreStudent', upload.fields([{
 // Start Fee Receipt routes
     router.post('/StoreReceipt', upload.single('image'), async (req, res) => {
     console.log(req.body);
-    const {receipt_date,defaulter_month,name,receipt_no,ref_receipt_no,last_fee_date,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date} = req.body;
+    const {receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,receipt_no,ref_receipt_no,last_fee_date,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date} = req.body;
+   const unique_id =session+receipt_no+admission_no
     try {
-        const Fee_structure_data = new Receipt({receipt_date,defaulter_month,name,receipt_no,last_fee_date,ref_receipt_no,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date})
+        const Fee_structure_data = new Receipt({unique_id,receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,receipt_no,last_fee_date,ref_receipt_no,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date})
         await Fee_structure_data.save();
         if (Fee_structure_data) {
             console.log("Fee_structure_data")
@@ -1239,22 +1334,157 @@ router.post('/StoreStudent', upload.fields([{
     })
     router.post('/DefaulterByMonth', async (req, res) => {
         console.log('yes im in' + req.body.session)
-        const { session,DefaulterByMonth,class_name } = req.body;
+        const { session,DefaulterByMonth,class_name,section } = req.body;
         const defaulter_month =DefaulterByMonth
+        var _id=[];
+       
         try {
-            if(class_name ==''){
-                const data = await Receipt.find({ session,defaulter_month })
-                if (data) {
-                    console.log(data[0])
-                }
-                res.send(data)
-            } else{
-                const data = await Receipt.find({ session,defaulter_month,class_name })
-                if (data) {
-                    console.log(data[0])
-                }
-                res.send(data)
-            }
+            if(class_name !='' && section !='' ){
+            const data = await Receipt.aggregate(
+                [
+                    {$match: { class_name: { $in: [class_name] },section: { $in: [section] } }
+                },
+                  { $sort: { last_fee_date: 1,  } },
+                  {
+                    $group:
+                      {
+                        _id: "$admission_no",
+                        last_id: { $last: "$_id" }
+                      }
+                  }
+                ]
+             )
+             if(data){
+                 data.map((item,index)=>{
+                    _id.push(mongoose.Types.ObjectId(item.last_id))
+                 })
+             }
+           var alldata=  Receipt.find({
+                '_id': { $in: _id},last_fee_date: { 
+                            $lt: defaulter_month
+                        },session
+            }, function(err, docs){
+                // var docs_id=[];
+                // docs.map((item,index)=>{
+                  
+                //     docs_id.push(mongoose.Types.ObjectId(item._id))
+                //  }) 
+
+
+                // ,balance: { 
+                //     $lte: 0
+                // }
+                Receipt.find({
+                    '_id': { $in: _id},session
+                }, function(err, docss){
+                    //  console.log(data);
+                     var array3 = docss.filter(function(obj) { return docs.indexOf(obj) == -1; });
+                     res.send(array3)
+                }).sort({ section: 1 });
+                 
+                //  res.send(docs)
+            }).sort({ section: 1 });
+        }else if(class_name !='' && section ==''){
+            const data = await Receipt.aggregate(
+                [
+                    {$match: { class_name: { $in: [class_name] } }
+                },
+                  { $sort: { last_fee_date: 1,  } },
+                  {
+                    $group:
+                      {
+                        _id: "$admission_no",
+                        last_id: { $last: "$_id" }
+                      }
+                  }
+                ]
+             )
+             if(data){
+                 data.map((item,index)=>{
+                    _id.push(mongoose.Types.ObjectId(item.last_id))
+                 })
+             }
+           var alldata=  Receipt.find({
+                '_id': { $in: _id},last_fee_date: { 
+                            $lt: defaulter_month
+                        },session
+            }, function(err, docs){
+                // var docs_id=[];
+                // docs.map((item,index)=>{
+                  
+                //     docs_id.push(mongoose.Types.ObjectId(item._id))
+                //  }) 
+
+                Receipt.find({
+                    '_id': { $in: _id},session
+                }, function(err, docss){
+                    //  console.log(data);
+                     var array3 = docss.filter(function(obj) { return docs.indexOf(obj) == -1; });
+                     res.send(array3)
+                }).sort({ section: 1 });
+                 
+                //  res.send(docs)
+            }).sort({ section: 1 });
+        }
+        else{
+            const data = await Receipt.aggregate(
+                [
+                    // {$match: { class_name: { $in: ["PRE-NUR"] } }
+                // },
+                  { $sort: { last_fee_date: 1, _id: 1 } },
+                  {
+                    $group:
+                      {
+                        _id: "$admission_no",
+                        last_id: { $last: "$_id" }
+                      }
+                  }
+                ]
+             )
+             if(data){
+                 data.map((item,index)=>{
+                    _id.push(mongoose.Types.ObjectId(item.last_id))
+                 })
+             }
+           var alldata=  Receipt.find({
+                '_id': { $in: _id},last_fee_date: { 
+                            $lt: defaulter_month
+                        },session
+            }, function(err, docs){
+                Receipt.find({
+                    '_id': { $in: _id},session
+                },function(err, docss){
+                    //  console.log(data);
+                     var array3 = docss.filter(function(obj) { return docs.indexOf(obj) == -1; });
+                     res.send(array3)
+                }).sort({ class_name: 1 });;
+                //  console.log(docs.length);
+                //  res.send(docs)
+            }).sort({ class_name: 1 });
+        }
+            // await Receipt.find({ '_id': { $in: _id},session, last_fee_date: { 
+            //             $lt: new Date(defaulter_month)
+            //         } })
+            
+        //    console.log(alldata);
+        //    console.log(data.length);
+            // if(class_name ==''){
+            //     const data = await Receipt.find({ session, last_fee_date: { 
+            //         $lt: new Date(defaulter_month)
+            //     } })
+            //     if (data) {
+            //         console.log(data[0])
+            //     }
+            //     res.send(data)
+            // } else{
+            //     const data = await Receipt.find({ session,last_fee_date: { 
+            //         $lt: new Date(defaulter_month)
+            //     },class_name })
+            //     if (data) {
+            //         console.log(data[0])
+            //     }
+            //     res.send(data)
+            // }
 
         }
         catch (err) {
@@ -1271,8 +1501,70 @@ router.post('/StoreStudent', upload.fields([{
             res.send(data)
         }
         catch (err) {
-            return res.status(422).send({ error: "error for fetching food data" })
+            // return res.status(422).send({ error: "error for fetching food data" })
         }
+    })
+    router.post('/getFeeReceipt', async (req, res) => {
+        console.log('yes im in' + req.body.session)
+        const { session } = req.body;
+            try {
+                const dataa = await Receipt.findOne({ session }).sort({ _id: -1 }).exec((err,data)=>{
+                    console.log("gfgfdgfdgfdgsadsadadsa",data)
+                    
+                    if(data !=null){
+                    res.send(data)
+                    }else{
+                    res.send([undefined]) 
+                    }
+                    console.log("vineet"+data)
+                })
+               
+                 console.log("vineet"+dataa)
+                //  res.send(dataa)
+             }
+             catch (err) {
+                 return res.status(422).send({ error: "error for fetching Receipt data" })
+             }
+      
+    
+       
+    })
+    router.put('/UpdateReceipt', upload.single('image') ,async (req, res) => {
+        const { _id,bank,paid_month,receipt_no,receipt_date,last_fee_date} = req.body;
+        // const image = req.file.path
+        Receipt.findByIdAndUpdate({_id},{bank,paid_month,receipt_no,receipt_date,last_fee_date}, function(err, result){
+            if(err){
+                res.send(err)
+            }
+            else{
+                res.send(result)
+            }
+        })
+    })
+    router.post('/getadmission_no', async (req, res) => {
+        console.log('yes im in' + req.body.session)
+        const { session } = req.body;
+            try {
+                const dataa = await Student.findOne({}).sort({ _id: -1 }).exec((err,data)=>{
+                    console.log("gfgfdgfdgfdgsadsadadsa",data)
+                    
+                    if(data !=null){
+                    res.send(data)
+                    }else{
+                    res.send([undefined]) 
+                    }
+                    console.log("vineet"+data)
+                })
+               
+                 console.log("vineet"+dataa)
+                //  res.send(dataa)
+             }
+             catch (err) {
+                 return res.status(422).send({ error: "error for fetching Receipt data" })
+             }
+      
+    
+       
     })
     // router.post('/getSummary', upload.single('image'), async (req, res) => {
     //     console.log(req.body);
