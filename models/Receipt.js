@@ -2,6 +2,25 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 // const bcrypt = require('bcrypt')
 const FeeReceiptSchema = new Schema({
+    unique_id:{
+        type:String, 
+        unique:true
+    },
+    take_computer:{
+        type:String, 
+    },
+    is_full_free_ship:{
+        type:String, 
+      
+    },
+    is_teacher_ward:{
+        type:String, 
+      
+    },
+    fee_concession:{
+        type:String, 
+      
+    },
     receipt_date:{
         type:String,        
     },
@@ -96,6 +115,9 @@ const FeeReceiptSchema = new Schema({
     bank_date:{
         type:String,        
     },
+    fees:{
+        type:String,    
+    }
 },{timestamps: true}
 )
 

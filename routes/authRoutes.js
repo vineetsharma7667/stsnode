@@ -27,6 +27,7 @@ const FeeStructure = mongoose.model('FeeStructure')
 const Receipt = mongoose.model('Receipt')
 const Bank = mongoose.model('Bank')
 const SuspensionalFee = mongoose.model('SuspensionalFee')
+const TransferCertificate = mongoose.model('TransferCertificate')
 
 
 
@@ -90,6 +91,97 @@ var storage = multer.diskStorage({
         }
     })
 // End Signin routes
+
+// Start Transfer certificate routes
+
+router.post('/StoreTcDetails', upload.single('image'), async (req, res) => {
+    console.log("yes i am in")
+    const { date_of_tc,date_of_aplication,name,account_no,parents,class_name,section,category,nationality,date_of_admission,dob,house,address,security_deposit,return_mode,bank,tc_no,cheque_no,reason,working_days,present_days,admission_no,is_promoted,promoted_in,result,last_school,result_remark,concession,concession_remark,games_remark,other_remark,conduct,session,tc_status,student_id,academic_id,left_on} = req.body;
+    
+    Student.findByIdAndUpdate({_id:student_id},{tc_status}, function(err, resultt){
+        if(err){
+            console.log("yes error here"+err)
+            res.send(err)
+        }
+        else{
+            Academic.findByIdAndUpdate({_id:academic_id},{tc_status}, function(errr, resulttt){
+                if(errr){
+                    res.send(errr)
+                }
+                else{
+                    const Tcdata = new TransferCertificate({student:student_id,academic_id:academic_id,date_of_tc,date_of_aplication,name,account_no,parents,class_name,section,category,nationality,date_of_admission,dob,house,address,security_deposit,return_mode,bank,tc_no,cheque_no,reason,working_days,present_days,admission_no,is_promoted,promoted_in,result,last_school,result_remark,concession,concession_remark,games_remark,other_remark,conduct,session,tc_status,left_on })
+                     Tcdata.save();
+                    if (Tcdata) {
+                        res.send(Tcdata)
+                    }
+                    else {
+                        console.log("data is not stored")
+                    }
+                }
+            })
+        }
+    })
+
+    })
+    router.post('/getTransferCertificate', async (req, res) => {
+        const {admission_no} = req.body
+        console.log(req.body)
+        try {
+                await TransferCertificate.find({admission_no}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data[0])
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+    router.post('/getAllTransferCertificate', async (req, res) => {
+        const {admission_no} = req.body
+        console.log(req.body)
+        try {
+                await TransferCertificate.find({}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data)
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+
+
+    router.post('/RecoverFromTc', upload.single('image'), async (req, res) => {
+        console.log("yes i am in")
+        const { tc_status,_id,academic_id,student_id} = req.body;
+        
+        Student.findByIdAndUpdate({_id:student_id},{tc_status}, function(err, resultt){
+            if(err){
+                console.log("yes error here"+err)
+                res.send(err)
+            }
+            else{
+                Academic.findByIdAndUpdate({_id:academic_id},{tc_status}, function(errr, resulttt){
+                    if(errr){
+                        res.send(errr)
+                    }
+                    else{
+                       var Tcdata=  TransferCertificate.findByIdAndRemove(_id).exec();
+                        if (Tcdata) {
+                            res.send(Tcdata)
+                        }
+                        else {
+                            console.log("data is not stored")
+                        }
+                    }
+                })
+            }
+        })
+    
+        })
+// End Transfer certificate routes
+
+
 // Suspensioanle fee
 router.post('/StoreSuspensionalVoucher', upload.single('image'), async (req, res) => {
     const { admission_no,bank,remark,account_no,receipt_date,class_name,amount } = req.body;
@@ -931,6 +1023,19 @@ router.post('/StoreStudent', upload.fields([{
             return res.status(422).send({ error: "error for fetching food data" })
         }
     })
+    router.post('/getStudentAccount_no', async (req, res) => {
+        // const { session,school_id} = req.body
+        console.log(req.body+"account no")
+        try {
+                await Academic.find({tc_status:"0"}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data)
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
     router.post('/getStudentForUpgrade', async (req, res) => {
         const { session, class_name} = req.body
         console.log(req.body)
@@ -1427,6 +1532,7 @@ router.post('/StoreStudent', upload.fields([{
             }).sort({ section: 1 });
         }
         else{
+            console.log("yes i am in else part")
             const data = await Receipt.aggregate(
                 [
                     // {$match: { class_name: { $in: ["PRE-NUR"] } }
@@ -1451,11 +1557,13 @@ router.post('/StoreStudent', upload.fields([{
                             $lt: defaulter_month
                         },session
             }, function(err, docs){
+                
                 Receipt.find({
                     '_id': { $in: _id},session
                 },function(err, docss){
-                    //  console.log(data);
+                    
                      var array3 = docss.filter(function(obj) { return docs.indexOf(obj) == -1; });
+                     console.log(array3)
                      res.send(array3)
                 }).sort({ class_name: 1 });;
                 //  console.log(docs.length);

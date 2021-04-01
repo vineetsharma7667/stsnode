@@ -26,6 +26,8 @@ require('./models/Fine');
 require('./models/Bank');
 require('./models/PreAdmissionForm');
 require('./models/SuspensionalFee');
+require('./models/TransferCertificate');
+
 
 const requireToken= require('./middleware/requireToken');
 app.use(bodyParser.json());
