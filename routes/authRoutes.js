@@ -1402,13 +1402,20 @@ router.post('/StoreStudent', upload.fields([{
     })
 // end Fee Structure routes
 // Start Fee Receipt routes
-    router.post('/StoreReceipt', upload.single('image'), async (req, res) => {
-    console.log(req.body);
-    const {receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,receipt_no,ref_receipt_no,last_fee_date,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date} = req.body;
-   const unique_id =session+receipt_no+admission_no
+router.post('/StoreReceipt', upload.single('image'), async (req, res) => {
+    console.log("unique_id"+req.body.unique_id);
+    const {receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,ref_receipt_no,last_fee_date,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date,unique_id} = req.body;
     try {
-        const Fee_structure_data = new Receipt({unique_id,receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,receipt_no,last_fee_date,ref_receipt_no,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date})
-        await Fee_structure_data.save();
+        const dataa = await Receipt.findOne({ session }).sort({ _id: -1 }).exec((err,data)=>{
+            var receipt_no
+            if(data !=null){
+                 receipt_no= parseInt(data.receipt_no)+1
+            }else{
+                receipt_no= 1
+            }
+            //    const receipt_no= parseInt(data.receipt_no)+1
+                const Fee_structure_data = new Receipt({unique_id:session+receipt_no,receipt_date,take_computer,fee_concession,is_full_free_ship,is_teacher_ward,fees,defaulter_month,name,receipt_no,last_fee_date,ref_receipt_no,session,admission_no,class_name,section,prospectus_fee,registration_fee,admission_fee,security_fee,account_no,paid_fees,Allfees,paid_month,paid_months,fine,paid_amount,balance,total_one_time_fee,total_monthly_fee,total_annual_fee,grand_total,payment_mode,bank,bank_v_no,check_no,bank_date})
+         Fee_structure_data.save();
         if (Fee_structure_data) {
             console.log("Fee_structure_data")
         }
@@ -1417,6 +1424,11 @@ router.post('/StoreStudent', upload.fields([{
         }
         console.log(Fee_structure_data);
         res.send(Fee_structure_data)
+           
+            console.log("vineet"+data)
+        })
+       
+    
     } catch (err) {
         return res.status(422).send(err.message)
      
