@@ -9,11 +9,9 @@ const PreAdmissionFormSchema = new Schema({
     date_of_admission:{
         type:String,        
     }, 
-   
     class_name:{
         type:String,        
     }, 
-   
     name:{
         type:String,        
     }, 
@@ -35,6 +33,9 @@ const PreAdmissionFormSchema = new Schema({
     parent_mobile:{
         type:String,     
     },
+    tc_status:{
+        type:String,
+    }
     // academics:[{ type: Schema.Types.ObjectId,
     //     ref:"Academic" 
     // }],

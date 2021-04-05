@@ -28,6 +28,7 @@ const Receipt = mongoose.model('Receipt')
 const Bank = mongoose.model('Bank')
 const SuspensionalFee = mongoose.model('SuspensionalFee')
 const TransferCertificate = mongoose.model('TransferCertificate')
+const PreAdmissionForm = mongoose.model('PreAdmissionForm')
 
 
 
@@ -232,7 +233,7 @@ router.post('/StoreSuspensionalVoucher', upload.single('image'), async (req, res
 
     router.delete('/deleteSuspensionalFee', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         SuspensionalFee.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -320,7 +321,7 @@ router.post('/StoreFeeSubCatogory', upload.single('image'), async (req, res) => 
     })
     router.delete('/deleteFeeSubCategory', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         FeeSubCategory.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -425,7 +426,7 @@ router.post('/StoreSession', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteSession', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Session.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -496,7 +497,7 @@ router.post('/StoreClass', upload.single('image'),async (req, res) => {
     })
     router.delete('/deleteClass', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Class.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -551,7 +552,7 @@ router.post('/StoreSection', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteSection', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Section.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -605,7 +606,7 @@ router.post('/StoreCategory', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteCategory', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Category.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -660,7 +661,7 @@ router.post('/StoreVehicle', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteVehicle', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Vehicle.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -714,7 +715,7 @@ router.post('/StoreVehicleType', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteVehicleType', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         VehicleType.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -770,7 +771,7 @@ router.put('/UpdateBankData', upload.single('image') ,async (req, res) => {
 })
 router.delete('/deleteBank', (req, res) => {
     const { _id } = req.body
-    console.log(_id)
+
     Bank.findByIdAndRemove(_id).exec();
     res.send({ res: "Deleted Sucessfully" })
 })
@@ -825,7 +826,7 @@ router.post('/StoreSubject', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteSubject', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Subject.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -880,7 +881,7 @@ router.post('/StoreHouse', upload.single('image'), async (req, res) => {
     })
     router.delete('/deleteHouse', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         House.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -1214,7 +1215,7 @@ router.post('/StoreStudent', upload.fields([{
 
     router.delete('/deleteFeeStructure', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         FeeStructure.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -1396,7 +1397,7 @@ router.post('/StoreStudent', upload.fields([{
     })
     router.delete('/deleteFeeStructure', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         FeeStructure.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -1717,7 +1718,7 @@ router.post('/StoreReceipt', upload.single('image'), async (req, res) => {
     })
     router.delete('/DeleteReceipt', (req, res) => {
         const { _id } = req.body
-        console.log(_id)
+
         Receipt.findByIdAndRemove(_id).exec();
         res.send({ res: "Deleted Sucessfully" })
     })
@@ -1897,5 +1898,96 @@ router.post('/StoreFine', upload.single('image'), async (req, res) => {
         })
     })
     // end Fine routes
+
+    // Start PreAdmissionForm routes
+    router.post('/StorePreAdmissionForm', upload.single('image'), async (req, res) => {
+    console.log(req.body);
+    const {session,date_of_admission,class_name,name,sex,dob,father_name,mother_name,parent_address,parent_mobile} = req.body;
+    try {
+        const PreAdmissionData_data = new PreAdmissionForm({session,date_of_admission,class_name,name,sex,dob,father_name,mother_name,parent_address,parent_mobile,tc_status:"1"})
+        await PreAdmissionData_data.save();
+        if (PreAdmissionData_data) {
+            console.log("PreAdmissionData_data")
+        }
+        else {
+            console.log("data is not stored")
+        }
+        console.log(PreAdmissionData_data);
+        res.send(PreAdmissionData_data)
+    } catch (err) {
+        return res.status(422).send(err.message)
+     
+    }
+    })
+    router.get('/getPreAdmissionFormData', async (req, res) => {
+        try {
+            const data = await PreAdmissionForm.find()
+            if (data) {
+                console.log(data[0])
+            }
+            console.log(data[0])
+            res.send(data)
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+    router.put('/updatePreadmissionFormData', upload.single('image') ,async (req, res) => {
+        const { _id,session,date_of_admission,class_name,name,sex,dob,father_name,mother_name,parent_address,parent_mobile,tc_status } = req.body;
+        // const image = req.file.path
+        PreAdmissionForm.findByIdAndUpdate({_id},{session,date_of_admission,class_name,name,sex,dob,father_name,mother_name,parent_address,parent_mobile,tc_status}, function(err, result){
+            if(err){
+                res.send(err)
+            }
+            else{
+                res.send(result)
+            }
+        })
+    })
+    router.delete('/deletePreAdmissionFormData', (req, res) => {
+        const { _id } = req.body
+
+        PreAdmissionForm.findByIdAndRemove(_id).exec();
+        res.send({ res: "Deleted Sucessfully" })
+    })
+
+    router.post('/getPreAdmissionStudentForUpgrade', async (req, res) => {
+        const { session} = req.body
+        console.log(req.body)
+        try {
+             await PreAdmissionForm.find({session,tc_status:"1"}).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data)
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+    router.post('/UpdatePreAdmissionStudentStatusForSorted', upload.single('image'),async (req, res) => {
+        const {IdArray} = req.body;
+        PreAdmissionForm.update( {_id: { $in: JSON.parse(IdArray) }}, { tc_status: "0" }, { multi: true }, function(err, result) {
+            if (err) {
+                res.send(err, null);
+            } 
+            else {
+                res.send(result);
+            }
+        }) 
+    })
+    router.post('/getPreAdmissionStudentForUpgradeAcademics', async (req, res) => {
+        const { session} = req.body
+        console.log(req.body)
+        try {
+             await PreAdmissionForm.find({session,tc_status:"0"}).sort({class_name:'1'}).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                res.send(data)
+            })
+        }
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching food data" })
+        }
+    })
+// end PreAdmissionForm routes
 module.exports = router
 
