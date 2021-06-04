@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 // const bcrypt = require('bcrypt')
 const AcademicSchema = new Schema({
     unique_id:{
-        // unique:true,
+        unique:true,
         type:String,      
         // required:true     
     },

@@ -10,9 +10,6 @@ const StudentSchema = new Schema({
     school_id:{
         type:String,        
     },
-    tc_status:{
-        type:String,        
-    },
     session:{
         type:String,        
     }, 
@@ -243,7 +240,7 @@ const StudentSchema = new Schema({
     gaurdian_mobile:{
         type:String,     
     },
-    tc:{
+    tc_status:{
         type:String,        
     }, 
     struck_off:{

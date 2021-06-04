@@ -24,9 +24,21 @@ require('./models/FeeStructure');
 require('./models/Receipt');
 require('./models/Fine');
 require('./models/Bank');
-require('./models/PreAdmissionForm');
 require('./models/SuspensionalFee');
 require('./models/TransferCertificate');
+require('./models/DefaulterMaker');
+
+// Employess routes
+require('./models/Employee');
+require('./models/Designation');
+require('./models/PayType');
+require('./models/PayCategory');
+require('./models/PayScaleType');
+require('./models/PayScale');
+
+
+require('./models/PreAdmissionForm');
+
 
 
 const requireToken= require('./middleware/requireToken');

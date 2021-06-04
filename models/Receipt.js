@@ -3,8 +3,9 @@ const Schema = mongoose.Schema;
 // const bcrypt = require('bcrypt')
 const FeeReceiptSchema = new Schema({
     unique_id:{
-        type:String, 
-        unique:true
+        unique:true,
+        type:String,    
+        required:true
     },
     take_computer:{
         type:String, 
