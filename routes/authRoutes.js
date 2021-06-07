@@ -1521,17 +1521,31 @@ router.post('/FeeAmount', upload.single('image'),async (req, res) => {
     }
 })
 router.post('/FeesClasswise', async (req, res) => {
-    console.log('yes im in' + req.body.class_name)
-    const { class_name,session } = req.body;
-    try {
-       const data = await FeeStructure.find({ class_name,session })
-        if (data) {
-            
+    console.log('yes im in' + req.body.class_name+"-"+req.body.section)
+    const { class_name,session,section } = req.body;
+    if(class_name!="12" && class_name!="11"){
+        try {
+        const data = await FeeStructure.find({ class_name,session })
+            if (data) {
+                
+            }
+            res.send(data)
         }
-        res.send(data)
+        catch (err) {
+            return res.status(422).send({ error: "error for fetching profile data" })
+        }
     }
-    catch (err) {
-        return res.status(422).send({ error: "error for fetching profile data" })
+    else{
+        try {
+            const data = await FeeStructure.find({ class_name,section,session })
+                if (data) {
+                    console.log("yeah its working")
+                }
+                res.send(data)
+            }
+            catch (err) {
+                return res.status(422).send({ error: "error for fetching profile data" })
+            }
     }
 })
  router.put('/updateFeeStructure', upload.single('image') ,async (req, res) => {
@@ -2822,10 +2836,10 @@ router.post('/SearchOldfeeSecurityRegisterAll', async (req, res) => {
         }) 
     })
     router.post('/getPreAdmissionStudentForUpgradeAcademics', async (req, res) => {
-        const { session} = req.body
+        const { session,class_name} = req.body
         console.log(req.body)
         try {
-             await PreAdmissionForm.find({session,tc_status:"0"}).sort({class_name:'1'}).exec((err,data)=>{
+             await PreAdmissionForm.find({session,class_name,tc_status:"0"}).sort({class_name:'1'}).exec((err,data)=>{
                 console.log("gfgfdgfdgfdgsadsadadsa",data)
                 res.send(data)
             })
