@@ -2849,5 +2849,29 @@ router.post('/SearchOldfeeSecurityRegisterAll', async (req, res) => {
         }
     })
 // end PreAdmissionForm routes
+// Start getLstadmissionNoBySession
+router.post('/getLstadmissionNoBySession', async (req, res) => {
+    console.log('yes im in' + req.body.session)
+    const { session } = req.body;
+        try {
+            const dataa = await Student.findOne({session}).sort({ _id: -1 }).exec((err,data)=>{
+                console.log("gfgfdgfdgfdgsadsadadsa",data)
+                
+                if(data !=null){
+                res.send(data)
+                }else{
+                res.send([undefined]) 
+                }
+                console.log("vineet"+data)
+            })
+           
+             console.log("vineet"+dataa)
+            //  res.send(dataa)
+         }
+         catch (err) {
+             return res.status(422).send({ error: "error for fetching Receipt data" })
+         } 
+})
+// End getLstadmissionNoBySession
 module.exports = router
 
