@@ -1053,7 +1053,7 @@ router.post('/singleparentdata', async (req, res) => {
     const { session,account_no} = req.body
     console.log(req.body)
     try {
-            await Academic.find({account_no,tc_status:'0'}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+            await Academic.find({session,account_no,tc_status:'0'}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
             console.log("gfgfdgfdgfdgsadsadadsa",data)
             res.send(data)
         })
@@ -1105,7 +1105,8 @@ router.post('/singlestudentdata', async (req, res) => {
     const { session,admission_no,school_id} = req.body
     console.log(req.body)
     try {
-         await Academic.find({admission_no,school_id}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
+    const { session,admission_no,school_id} = req.body
+         await Academic.find({session,admission_no,school_id}).populate('student').sort({ _id: -1 }).exec((err,data)=>{
             console.log("gfgfdgfdgfdgsadsadadsa",data)
             res.send(data)
         })
